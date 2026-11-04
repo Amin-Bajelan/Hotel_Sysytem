@@ -1,27 +1,31 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
 
-	"smart-hotel-dispatch/internal/models"
+	"smart-hotel-dispatch/internal/data"
+	"smart-hotel-dispatch/ui"
 )
 
 func main() {
+	ds, err := data.LoadSample()
+	if err != nil {
+		log.Fatalf("failed to load sample data: %v", err)
+	}
+	store := data.NewStore(ds)
+
 	a := app.New()
 	w := a.NewWindow("Smart Hotel Staff Dispatch")
 
-	demo := models.Staff{ID: "S1", Name: "Ali", Status: models.StatusAvailable}
-	label := widget.NewLabel(fmt.Sprintf("Setup OK. Demo staff: %s (%s)", demo.Name, demo.Status))
-
-	w.SetContent(container.NewVBox(
-		widget.NewLabelWithStyle("Smart Hotel Staff Dispatch", fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
-		label,
-	))
+	tabs := container.NewAppTabs(
+		container.NewTabItem("Staff", ui.NewStaffTab(store, w)),
+		container.NewTabItem("Tasks", ui.NewTasksTab(store)),
+	)
+	w.SetContent(tabs)
 	w.Resize(fyne.NewSize(1000, 650))
 	w.ShowAndRun()
 }

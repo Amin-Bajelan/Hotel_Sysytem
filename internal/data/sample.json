@@ -1,0 +1,13 @@
+{
+  "staff": [
+    {"id":"S1","name":"Ali","role":"Housekeeper","skills":["Room Cleaning","Towel Request"],"floor":1,"x":10,"y":20,"speed":1.5,"status":"Available","current_task_id":""},
+    {"id":"S2","name":"Sara","role":"Waiter","skills":["Food Delivery","Guest Assistance"],"floor":0,"x":50,"y":10,"speed":1.8,"status":"Available","current_task_id":""},
+    {"id":"S3","name":"Reza","role":"Technician","skills":["Maintenance"],"floor":2,"x":30,"y":40,"speed":1.2,"status":"Available","current_task_id":""},
+    {"id":"S4","name":"Neda","role":"Receptionist","skills":["Guest Assistance","Towel Request"],"floor":0,"x":5,"y":5,"speed":1.6,"status":"Available","current_task_id":""}
+  ],
+  "tasks": [
+    {"id":"T1","room_number":101,"type":"Room Cleaning","priority":"Normal","status":"Pending","created_at":"2026-11-03T09:00:00Z","assigned_staff_id":"","estimated_duration_min":20},
+    {"id":"T2","room_number":205,"type":"Maintenance","priority":"High","status":"Pending","created_at":"2026-11-03T09:05:00Z","assigned_staff_id":"","estimated_duration_min":30},
+    {"id":"T3","room_number":102,"type":"Food Delivery","priority":"Urgent","status":"Pending","created_at":"2026-11-03T09:07:00Z","assigned_staff_id":"","estimated_duration_min":10}
+  ]
+}

@@ -39,3 +39,7 @@ type Task struct {
 	AssignedStaffID   string     `json:"assigned_staff_id"`
 	EstimatedDuration int        `json:"estimated_duration_min"`
 }
+
+var AllTaskTypes = []TaskType{
+	RoomCleaning, TowelRequest, FoodDelivery, Maintenance, GuestAssistance,
+}

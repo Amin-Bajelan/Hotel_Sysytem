@@ -23,7 +23,8 @@ func main() {
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Staff", ui.NewStaffTab(store, w)),
-		container.NewTabItem("Tasks", ui.NewTasksTab(store)),
+		container.NewTabItem("Tasks", ui.NewTasksTab(store, w)),
+		container.NewTabItem("Dispatch", ui.NewDispatchTab(store)),
 	)
 	w.SetContent(tabs)
 	w.Resize(fyne.NewSize(1000, 650))

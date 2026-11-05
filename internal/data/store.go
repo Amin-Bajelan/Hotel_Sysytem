@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-
+	"time"
 	"smart-hotel-dispatch/internal/models"
 )
 
@@ -72,4 +72,41 @@ func (s *Store) AddStaff(st models.Staff) (models.Staff, error) {
 
 	s.staff = append(s.staff, st)
 	return st, nil
+}
+func (s *Store) hasTaskID(id string) bool {
+	for _, t := range s.tasks {
+		if t.ID == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Store) AddTask(room int, tt models.TaskType, p models.Priority, minutes int) (models.Task, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	floor, n := room/100, room%100
+	if floor < 1 || floor > 3 || n < 1 || n > 7 {
+		return models.Task{}, errors.New("room must be 101-107, 201-207 or 301-307")
+	}
+	if minutes <= 0 {
+		return models.Task{}, errors.New("duration must be greater than zero")
+	}
+
+	id := len(s.tasks) + 1
+	for s.hasTaskID(fmt.Sprintf("T%d", id)) {
+		id++
+	}
+	t := models.Task{
+		ID:                fmt.Sprintf("T%d", id),
+		RoomNumber:        room,
+		Type:              tt,
+		Priority:          p,
+		Status:            models.StatusPending,
+		CreatedAt:         time.Now(),
+		EstimatedDuration: minutes,
+	}
+	s.tasks = append(s.tasks, t)
+	return t, nil
 }

@@ -13,6 +13,7 @@ type Staff struct {
 	Role          string      `json:"role"`
 	Skills        []TaskType  `json:"skills"`
 	Floor         int         `json:"floor"`
+	TasksHandled  int         `json:"tasks_handled"`
 	X             float64     `json:"x"`
 	Y             float64     `json:"y"`
 	Speed         float64     `json:"speed"`

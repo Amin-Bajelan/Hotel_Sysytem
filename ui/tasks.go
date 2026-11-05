@@ -5,7 +5,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
-
+	"fyne.io/fyne/v2/container"
 	"smart-hotel-dispatch/internal/data"
 	"smart-hotel-dispatch/internal/models"
 )
@@ -37,7 +37,7 @@ func taskCell(t models.Task, col int) string {
 	return ""
 }
 
-func NewTasksTab(store *data.Store) fyne.CanvasObject {
+func NewTasksTab(store *data.Store, win fyne.Window) fyne.CanvasObject {
 	table := widget.NewTable(
 		func() (int, int) { return len(store.Tasks()) + 1, len(taskHeaders) },
 		func() fyne.CanvasObject { return widget.NewLabel("placeholder") },
@@ -61,5 +61,8 @@ func NewTasksTab(store *data.Store) fyne.CanvasObject {
 	for i, w := range widths {
 		table.SetColumnWidth(i, w)
 	}
-	return table
+	addBtn := widget.NewButton("Add Task", func() {
+		showAddTaskDialog(store, win, table.Refresh)
+	})
+	return container.NewBorder(container.NewHBox(addBtn), nil, nil, nil, table)
 }

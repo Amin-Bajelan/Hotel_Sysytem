@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	"smart-hotel-dispatch/internal/models"
 )
@@ -25,9 +26,31 @@ func parse(b []byte) (*Dataset, error) {
 	return &ds, nil
 }
 
+// rebase shifts task times so the newest task was created "now".
+func rebase(ds *Dataset) {
+	var latest time.Time
+	for _, t := range ds.Tasks {
+		if t.CreatedAt.After(latest) {
+			latest = t.CreatedAt
+		}
+	}
+	if latest.IsZero() {
+		return
+	}
+	shift := time.Since(latest)
+	for i := range ds.Tasks {
+		ds.Tasks[i].CreatedAt = ds.Tasks[i].CreatedAt.Add(shift)
+	}
+}
+
 // LoadSample loads the data embedded in the binary.
 func LoadSample() (*Dataset, error) {
-	return parse(sampleJSON)
+	ds, err := parse(sampleJSON)
+	if err != nil {
+		return nil, err
+	}
+	rebase(ds)
+	return ds, nil
 }
 
 // LoadFromFile loads a dataset from a JSON file on disk.

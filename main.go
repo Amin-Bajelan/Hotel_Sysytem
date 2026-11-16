@@ -22,6 +22,7 @@ func main() {
 	w := a.NewWindow("Smart Hotel Staff Dispatch")
 
 	tabs := container.NewAppTabs(
+		container.NewTabItem("Dashboard", ui.NewDashboardTab(store)),
 		container.NewTabItem("Staff", ui.NewStaffTab(store, w)),
 		container.NewTabItem("Tasks", ui.NewTasksTab(store, w)),
 		container.NewTabItem("Dispatch", ui.NewDispatchTab(store)),

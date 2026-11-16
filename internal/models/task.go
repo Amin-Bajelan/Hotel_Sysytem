@@ -38,6 +38,9 @@ type Task struct {
 	CreatedAt         time.Time  `json:"created_at"`
 	AssignedStaffID   string     `json:"assigned_staff_id"`
 	EstimatedDuration int        `json:"estimated_duration_min"`
+	AssignedAt        time.Time  `json:"assigned_at"`
+	CompletedAt       time.Time  `json:"completed_at"`
+	Distance          float64    `json:"distance"`
 }
 
 var AllTaskTypes = []TaskType{

@@ -74,7 +74,7 @@ func NewStaffTab(store *data.Store, win fyne.Window) fyne.CanvasObject {
 	for i, w := range widths {
 		table.SetColumnWidth(i, w)
 	}
-
+	store.Subscribe(func() {fyne.Do(table.Refresh)})
 	addBtn := widget.NewButton("Add Staff", func() {
 		showAddStaffDialog(store, win, table.Refresh)
 	})

@@ -4,8 +4,9 @@ import (
 	"strconv"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
+
 	"smart-hotel-dispatch/internal/data"
 	"smart-hotel-dispatch/internal/models"
 )
@@ -61,6 +62,7 @@ func NewTasksTab(store *data.Store, win fyne.Window) fyne.CanvasObject {
 	for i, w := range widths {
 		table.SetColumnWidth(i, w)
 	}
+	store.Subscribe(func() { fyne.Do(table.Refresh) })
 	addBtn := widget.NewButton("Add Task", func() {
 		showAddTaskDialog(store, win, table.Refresh)
 	})

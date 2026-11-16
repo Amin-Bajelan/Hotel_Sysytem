@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -24,7 +25,7 @@ func NewDispatchTab(store *data.Store) fyne.CanvasObject {
 	output := widget.NewLabel("Press Preview to see assignment decisions.")
 	output.Wrapping = fyne.TextWrapWord
 
-	btn := widget.NewButton("Preview Assignments", func() {
+	preview := widget.NewButton("Preview", func() {
 		tasks := store.Tasks()
 		byID := map[string]models.Task{}
 		for _, t := range tasks {
@@ -48,6 +49,50 @@ func NewDispatchTab(store *data.Store) fyne.CanvasObject {
 		output.SetText(sb.String())
 	})
 
-	top := container.NewHBox(widget.NewLabel("Strategy:"), choice, btn)
+	apply := widget.NewButton("Apply Assignments", func() {
+		decisions := dispatch.Dispatch(strategies[choice.Selected], store.Tasks(), store.Staff())
+		now := time.Now()
+		applied, left := 0, 0
+		for _, d := range decisions {
+			if d.Chosen == nil {
+				left++
+				continue
+			}
+			if err := store.AssignTask(d.TaskID, d.Chosen.Staff.ID, d.Chosen.Distance, now); err != nil {
+				left++
+				continue
+			}
+			applied++
+		}
+		output.SetText(fmt.Sprintf("Applied %d assignment(s); %d task(s) left pending.", applied, left))
+	})
+
+	complete := widget.NewButton("Complete All Assigned", func() {
+		now := time.Now()
+		n := 0
+		for _, t := range store.Tasks() {
+			if t.Status == models.StatusAssigned || t.Status == models.StatusInProgress {
+				if store.CompleteTask(t.ID, now) == nil {
+					n++
+				}
+			}
+		}
+		output.SetText(fmt.Sprintf("Completed %d task(s).", n))
+	})
+
+	reset := widget.NewButton("Reset Data", func() {
+		ds, err := data.LoadSample()
+		if err != nil {
+			output.SetText("Reset failed: " + err.Error())
+			return
+		}
+		store.Reset(ds)
+		output.SetText("Data reset to sample.")
+	})
+
+	top := container.NewVBox(
+		container.NewHBox(widget.NewLabel("Strategy:"), choice),
+		container.NewHBox(preview, apply, complete, reset),
+	)
 	return container.NewBorder(top, nil, nil, nil, container.NewVScroll(output))
 }

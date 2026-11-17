@@ -15,10 +15,11 @@ type Store struct {
 	staff     []models.Staff
 	tasks     []models.Task
 	listeners []func()
+	clock     func() time.Time
 }
 
 func NewStore(ds *Dataset) *Store {
-	s := &Store{}
+	s := &Store{clock: time.Now}
 	s.staff = append(s.staff, ds.Staff...)
 	s.tasks = append(s.tasks, ds.Tasks...)
 	return s
@@ -141,7 +142,7 @@ func (s *Store) AddTask(room int, tt models.TaskType, p models.Priority, minutes
 			Type:              tt,
 			Priority:          p,
 			Status:            models.StatusPending,
-			CreatedAt:         time.Now(),
+			CreatedAt:         s.clock(),
 			EstimatedDuration: minutes,
 		}
 		s.tasks = append(s.tasks, t)
@@ -197,6 +198,26 @@ func (s *Store) CompleteTask(taskID string, at time.Time) error {
 			s.staff[si].Status = models.StatusAvailable
 			s.staff[si].CurrentTaskID = ""
 		}
+		return nil
+	})
+}
+
+// SetClock sets the time source used for new tasks (the simulation clock).
+func (s *Store) SetClock(fn func() time.Time) {
+	s.mu.Lock()
+	if fn == nil {
+		fn = time.Now
+	}
+	s.clock = fn
+	s.mu.Unlock()
+}
+
+// Update lets the simulation change many employees and tasks in one step.
+// fn runs under the write lock and must NOT call other Store methods.
+// Listeners are notified once, after fn returns.
+func (s *Store) Update(fn func(staff []models.Staff, tasks []models.Task)) {
+	_ = s.mutate(func() error {
+		fn(s.staff, s.tasks)
 		return nil
 	})
 }
